@@ -209,19 +209,16 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
 
             val lastWord = lastTextBeforeCursor.split(" ").last()
 
-            // Updated consonant set with double-character ones
             val consonants = listOf(
-                "zh", "ch", "sh", // Double-character consonants
+                "zh", "ch", "sh",
                 "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h",
                 "j", "q", "x", "z", "r", "c", "s", "y", "w"
             )
 
-            // Regex to match the last consonant before a vowel in the word
             val consonantRegex = "(${consonants.joinToString("|")})(?=[aeiouü])".toRegex()
             val lastSyllableStart = consonantRegex.findAll(lastWord).lastOrNull()?.range?.first ?: 0
             val lastSyllable = lastWord.substring(lastSyllableStart)
 
-            // Find vowels within the latest syllable
             val vowels = listOf('a', 'o', 'e', 'i', 'u', 'ü')
             val vowelIndices = lastSyllable.mapIndexedNotNull { index, c -> if (c in vowels) index else null }
 
@@ -254,7 +251,6 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
         return super.onKeyDown(keyCode, event)
     }
 
-    // A helper function to apply tones to Pinyin vowels
     private fun applyTone(vowel: Char, toneIndex: Int): Char? {
         val pinyinTones = mapOf(
             'a' to listOf('ā', 'á', 'ǎ', 'à'),
