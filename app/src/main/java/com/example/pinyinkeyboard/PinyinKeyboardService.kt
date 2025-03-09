@@ -66,7 +66,6 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
                 "j", "q", "x", "z", "c", "r", "s", "y", "w"
             )
 
-            // Find the last consonant in the word before the vowels
             val consonantRegex = "(${consonants.joinToString("|")})(?=[aeiouü])".toRegex()
             val lastConsonantMatch = consonantRegex.findAll(lastWord).lastOrNull()
             val lastConsonantIndex = lastConsonantMatch?.range?.last ?: -1
@@ -186,7 +185,6 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             KeyEvent.KEYCODE_SHIFT_RIGHT to "ang"
         )
 
-        // Tone key mapping (using tone indices instead of characters)
         val toneMap = mapOf(
             KeyEvent.KEYCODE_ALT_LEFT to 0, // First tone
             KeyEvent.KEYCODE_CTRL_LEFT to 1, // Second tone
@@ -194,13 +192,11 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             KeyEvent.KEYCODE_DPAD_DOWN to 3  // Fourth tone
         )
 
-        // Handle standard character inputs
         if (keyCode in keyMap.keys) {
             inputConnection.commitText(keyMap[keyCode], 1)
             return true
         }
 
-// Handle tone keys
         if (keyCode in toneMap.keys) {
             val toneIndex = toneMap[keyCode] ?: return true
 
