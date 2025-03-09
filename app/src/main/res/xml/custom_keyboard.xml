@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Keyboard xmlns:android="http://schemas.android.com/apk/res/android"
+    android:horizontalGap="5dp"
+    android:verticalGap="5dp"
+    android:keyHeight="60dp"
+    android:keyWidth="8.5%p">
+
+    <Row>
+        <Key android:keyLabel="b" android:keyEdgeFlags="left"/>
+        <Key android:keyLabel="d"/>
+        <Key android:keyLabel="y"/>
+        <Key android:keyLabel="w"/>
+        <Key android:keyLabel="zh" android:codes="-1"/>
+        <Key android:keyLabel="an" android:codes="-2"/>
+        <Key android:keyLabel="en" android:codes="-3"/>
+        <Key android:keyLabel="in" android:codes="-4"/>
+        <Key android:keyLabel="un" android:codes="-5"/>
+        <Key android:keyLabel="ün" android:codes="-6"/>
+        <Key android:keyLabel="er" android:codes="-7"/>
+        <Key android:keyLabel="ong" android:codes="-8" android:keyEdgeFlags="right"/>
+    </Row>
+
+    <Row>
+        <Key android:keyLabel="p" android:keyEdgeFlags="left"/>
+        <Key android:keyLabel="t"/>
+        <Key android:keyLabel="g"/>
+        <Key android:keyLabel="j"/>
+        <Key android:keyLabel="ch" android:codes="-9"/>
+        <Key android:keyLabel="z"/>
+        <Key android:keyLabel="i"/>
+        <Key android:keyLabel="a"/>
+        <Key android:keyLabel="ai" android:codes="-10"/>
+        <Key android:keyLabel="ao" android:codes="-11"/>
+        <Key android:keyLabel="ie" android:codes="-12"/>
+        <Key android:keyLabel="ing" android:codes="-13" android:keyEdgeFlags="right"/>
+    </Row>
+
+    <Row>
+        <Key android:keyLabel="m" android:keyEdgeFlags="left"/>
+        <Key android:keyLabel="n"/>
+        <Key android:keyLabel="k"/>
+        <Key android:keyLabel="q"/>
+        <Key android:keyLabel="sh" android:codes="-14"/>
+        <Key android:keyLabel="c"/>
+        <Key android:keyLabel="u"/>
+        <Key android:keyLabel="o"/>
+        <Key android:keyLabel="ei" android:codes="-15"/>
+        <Key android:keyLabel="ou" android:codes="-16"/>
+        <Key android:keyLabel="üe" android:codes="-17"/>
+        <Key android:keyLabel="eng" android:codes="-18" android:keyEdgeFlags="right"/>
+    </Row>
+
+    <Row android:keyWidth="9%p">>
+        <Key android:keyLabel="f" android:keyEdgeFlags="left"/>
+        <Key android:keyLabel="l"/>
+        <Key android:keyLabel="h"/>
+        <Key android:keyLabel="x"/>
+        <Key android:keyLabel="r"/>
+        <Key android:keyLabel="s"/>
+        <Key android:keyLabel="ü"/>
+        <Key android:keyLabel="e"/>
+        <Key android:keyLabel="ui" android:codes="-19"/>
+        <Key android:keyLabel="iu" android:codes="-20"/>
+        <Key android:keyLabel="ang" android:codes="-21" android:keyEdgeFlags="right"/>
+    </Row>
+
+    <Row
+        android:keyWidth="16%p">
+        <Key android:keyLabel= " " android:keyEdgeFlags="left"/>
+        <Key android:keyLabel= "ˉ" android:codes="-22"/>
+        <Key android:keyLabel= "ˊ" android:codes="-23"/>
+        <Key android:keyLabel="ˇ" android:codes="-24"/>
+        <Key android:keyLabel="ˋ" android:codes="-25"/>
+        <Key android:keyLabel= "⌫" android:codes="-26" android:keyEdgeFlags="right"/>
+    </Row>
+
+</Keyboard>

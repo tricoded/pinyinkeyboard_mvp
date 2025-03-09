@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PinyinKeyboard</string>
+    <string name="pinyin_keyboard_service">Pinyin Keyboard Service</string>
+    <string name="subtype_en_US">English (US)</string>
+</resources>
