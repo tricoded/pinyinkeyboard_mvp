@@ -186,8 +186,8 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
         )
 
         val toneMap = mapOf(
-            KeyEvent.KEYCODE_ALT_LEFT to 0, // First tone
-            KeyEvent.KEYCODE_CTRL_LEFT to 1, // Second tone
+            KeyEvent.KEYCODE_ALT_RIGHT to 0, // First tone
+            KeyEvent.KEYCODE_CTRL_RIGHT to 1, // Second tone
             KeyEvent.KEYCODE_DPAD_LEFT to 2, // Third tone
             KeyEvent.KEYCODE_DPAD_DOWN to 3  // Fourth tone
         )
