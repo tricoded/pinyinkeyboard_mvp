@@ -12,11 +12,13 @@
         android:ems="10"
         android:hint="Test Pinyin Keyboard"
         android:inputType="text"
+        android:textAlignment="center"
+        android:textAllCaps="false"
         android:textSize="50sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.446"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.497" />
+        app:layout_constraintVertical_bias="0.500" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -182,8 +182,51 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             KeyEvent.KEYCODE_COMMA to "e",
             KeyEvent.KEYCODE_PERIOD to "ui",
             KeyEvent.KEYCODE_SLASH to "iu",
-            KeyEvent.KEYCODE_SHIFT_RIGHT to "ang"
-        )
+            KeyEvent.KEYCODE_SHIFT_RIGHT to "ang",
+
+            // UNUSED
+// Esc row
+            KeyEvent.KEYCODE_F1 to "",
+            KeyEvent.KEYCODE_F2 to "",
+            KeyEvent.KEYCODE_F3 to "",
+            KeyEvent.KEYCODE_F4 to "",
+            KeyEvent.KEYCODE_F5 to "",
+            KeyEvent.KEYCODE_F6 to "",
+            KeyEvent.KEYCODE_F7 to "",
+            KeyEvent.KEYCODE_F8 to "",
+            KeyEvent.KEYCODE_F9 to "",
+            KeyEvent.KEYCODE_F10 to "",
+            KeyEvent.KEYCODE_F11 to "",
+            KeyEvent.KEYCODE_F12 to "",
+            KeyEvent.KEYCODE_ESCAPE to "",
+
+
+// Number row
+            KeyEvent.KEYCODE_EQUALS to "",
+
+
+// Tab row
+            KeyEvent.KEYCODE_TAB to "",
+            KeyEvent.KEYCODE_BACKSLASH to "",
+
+
+// Caps Lock row
+            KeyEvent.KEYCODE_CAPS_LOCK to "",
+
+
+// Shift row
+            KeyEvent.KEYCODE_SHIFT_LEFT to "",
+
+
+// Ctrl row
+            KeyEvent.KEYCODE_CTRL_LEFT to "",
+            KeyEvent.KEYCODE_ALT_LEFT to "",
+            KeyEvent.KEYCODE_DPAD_UP to "",
+            KeyEvent.KEYCODE_DPAD_RIGHT to "",
+            KeyEvent.KEYCODE_FUNCTION to "",
+            KeyEvent.KEYCODE_WINDOW to "",
+
+            )
 
         val toneMap = mapOf(
             KeyEvent.KEYCODE_ALT_RIGHT to 0, // First tone
@@ -191,6 +234,11 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             KeyEvent.KEYCODE_DPAD_LEFT to 2, // Third tone
             KeyEvent.KEYCODE_DPAD_DOWN to 3  // Fourth tone
         )
+
+        if (keyCode == KeyEvent.KEYCODE_SPACE) {
+            inputConnection.deleteSurroundingText(Int.MAX_VALUE, Int.MAX_VALUE)
+            return true
+        }
 
         if (keyCode in keyMap.keys) {
             inputConnection.commitText(keyMap[keyCode], 1)
@@ -243,8 +291,8 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             return true
         }
 
-
         return super.onKeyDown(keyCode, event)
+
     }
 
     private fun applyTone(vowel: Char, toneIndex: Int): Char? {
