@@ -1,13 +1,21 @@
 package com.example.pinyinkeyboard
 
+import android.content.Context
 import android.inputmethodservice.InputMethodService
 import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener
+import android.media.MediaPlayer
 import android.view.View
 import android.view.KeyEvent
 
+fun playSound(context: Context, fileName: String) {
+    val mediaPlayer = MediaPlayer.create(context, context.resources.getIdentifier(fileName, "raw", context.packageName))
+    mediaPlayer?.start()
+}
+
 class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
+    var pinyin = ""
     override fun onEvaluateInputViewShown(): Boolean {
         super.onEvaluateInputViewShown()
         return true
@@ -237,11 +245,13 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
 
         if (keyCode == KeyEvent.KEYCODE_SPACE) {
             inputConnection.deleteSurroundingText(Int.MAX_VALUE, Int.MAX_VALUE)
+            playSound(this, "$pinyin.mp3");
             return true
         }
 
         if (keyCode in keyMap.keys) {
             inputConnection.commitText(keyMap[keyCode], 1)
+            pinyin += keyMap[keyCode]
             return true
         }
 
@@ -285,14 +295,19 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
                     val textBeforeWord = lastTextBeforeCursor.dropLast(lastWord.length)
                     inputConnection.deleteSurroundingText(lastTextBeforeCursor.length, 0)
                     inputConnection.commitText(textBeforeWord + updatedWord, 1)
+
+                    if (pinyin.contains('1') || pinyin.contains('2') || pinyin.contains('3') || pinyin.contains('4')) {
+                        pinyin = pinyin.dropLast(1);
+                    }
+                    pinyin += keyCode + 1
                 }
             }
 
             return true
         }
 
-        return super.onKeyDown(keyCode, event)
 
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun applyTone(vowel: Char, toneIndex: Int): Char? {
