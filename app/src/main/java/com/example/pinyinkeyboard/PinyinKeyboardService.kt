@@ -6,6 +6,7 @@ import android.inputmethodservice.Keyboard
 import android.inputmethodservice.KeyboardView
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener
 import android.media.MediaPlayer
+import android.util.Log
 import android.view.View
 import android.view.KeyEvent
 
@@ -233,8 +234,7 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             KeyEvent.KEYCODE_DPAD_RIGHT to "",
             KeyEvent.KEYCODE_FUNCTION to "",
             KeyEvent.KEYCODE_WINDOW to "",
-
-            )
+        )
 
         val toneMap = mapOf(
             KeyEvent.KEYCODE_ALT_RIGHT to 0, // First tone
@@ -244,9 +244,20 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
         )
 
         if (keyCode == KeyEvent.KEYCODE_SPACE) {
-            inputConnection.deleteSurroundingText(Int.MAX_VALUE, Int.MAX_VALUE)
-            playSound(this, "$pinyin.mp3");
-            return true
+
+            val lastTextBeforeCursor = inputConnection.getTextBeforeCursor(20, 0)?.toString() ?: ""
+            val lastWord = lastTextBeforeCursor.split(" ").lastOrNull() ?: ""
+
+            if (lastWord.isNotEmpty()) {
+                inputConnection.deleteSurroundingText(lastWord.length, 0)
+            }
+
+            if(pinyin == "long") pinyin+= Char(48)
+
+            playSound(this, pinyin)
+            pinyin=""
+
+            return true // Prevents default system action
         }
 
         if (keyCode in keyMap.keys) {
@@ -296,10 +307,10 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
                     inputConnection.deleteSurroundingText(lastTextBeforeCursor.length, 0)
                     inputConnection.commitText(textBeforeWord + updatedWord, 1)
 
-                    if (pinyin.contains('1') || pinyin.contains('2') || pinyin.contains('3') || pinyin.contains('4')) {
-                        pinyin = pinyin.dropLast(1);
+                    if (pinyin.takeLast(1).matches(Regex("[1-4]"))) {
+                        pinyin = pinyin.dropLast(1)
                     }
-                    pinyin += keyCode + 1
+                    pinyin += (toneIndex + 1).toString()
                 }
             }
 
@@ -319,7 +330,6 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             'u' to listOf('ū', 'ú', 'ǔ', 'ù'),
             'ü' to listOf('ǖ', 'ǘ', 'ǚ', 'ǜ')
         )
-
         return pinyinTones[vowel]?.getOrNull(toneIndex)
     }
 
