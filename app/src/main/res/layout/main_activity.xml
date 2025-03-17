@@ -4,18 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#DFDEDE">
+    android:background="#BDBDBD">
 
     <EditText
         android:id="@+id/editTextText"
-        android:layout_width="543dp"
-        android:layout_height="198dp"
+        android:layout_width="565dp"
+        android:layout_height="180dp"
         android:ems="10"
-        android:hint="Test Pinyin Keyboard"
+        android:hint="Type pinyin here"
         android:inputType="text"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:textSize="50sp"
+        android:textColorHint="#80FFFFFF"
+        android:textSize="61sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.446"

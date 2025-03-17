@@ -9,6 +9,11 @@ import android.media.MediaPlayer
 import android.util.Log
 import android.view.View
 import android.view.KeyEvent
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.graphics.Color
+import android.view.inputmethod.InputConnection
 
 fun playSound(context: Context, fileName: String) {
     val mediaPlayer = MediaPlayer.create(context, context.resources.getIdentifier(fileName, "raw", context.packageName))
@@ -104,7 +109,7 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
                 }
             }
 
-        return
+            return
         }
 
 
@@ -252,6 +257,11 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
                 inputConnection.deleteSurroundingText(lastWord.length, 0)
             }
 
+            if (pinyin in listOf("lü", "lü1", "lü2", "lü3", "lü4", "lüe", "lüe1", "lüe2", "lüe3", "lüe4",
+                    "nü", "nü1", "nü2", "nü3", "nü4", "nüe", "nüe1", "nüe2", "nüe3", "nüe4")) {
+                pinyin = pinyin.replace("ü", "v")
+            }
+
             if(pinyin == "long") pinyin+= Char(48)
 
             playSound(this, pinyin)
@@ -261,29 +271,37 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
         }
 
         if (keyCode in keyMap.keys) {
-            inputConnection.commitText(keyMap[keyCode], 1)
-            pinyin += keyMap[keyCode]
+            val textToInsert = keyMap[keyCode] ?: return true
+            inputConnection.commitText(textToInsert, 1)
+            pinyin += textToInsert
+
+            // Get the current text and reapply colors dynamically
+            val currentText = inputConnection.getTextBeforeCursor(20, 0)?.toString() ?: ""
+            highlightPinyin(inputConnection, currentText)
+
             return true
         }
 
+        // Handling tone input
         if (keyCode in toneMap.keys) {
-            val toneIndex = toneMap[keyCode] ?: return true
-
-            val lastTextBeforeCursor = inputConnection.getTextBeforeCursor(10, 0)?.toString() ?: return true
-            if (lastTextBeforeCursor.isEmpty()) return true
-
-            val lastWord = lastTextBeforeCursor.split(" ").last()
-
             val consonants = listOf(
                 "zh", "ch", "sh",
                 "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h",
                 "j", "q", "x", "z", "r", "c", "s", "y", "w"
             )
 
+            val toneIndex = toneMap[keyCode] ?: return true
+            val inputText = inputConnection.getTextBeforeCursor(10, 0)?.toString() ?: return true
+            if (inputText.isEmpty()) return true
+
+            val lastWord = inputText.split(" ").last()
+
+            // Find syllable start position
             val consonantRegex = "(${consonants.joinToString("|")})(?=[aeiouü])".toRegex()
             val lastSyllableStart = consonantRegex.findAll(lastWord).lastOrNull()?.range?.first ?: 0
             val lastSyllable = lastWord.substring(lastSyllableStart)
 
+            // Identify vowel for tone placement
             val vowels = listOf('a', 'o', 'e', 'i', 'u', 'ü')
             val vowelIndices = lastSyllable.mapIndexedNotNull { index, c -> if (c in vowels) index else null }
 
@@ -303,10 +321,13 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
                     val newSyllable = lastSyllable.substring(0, toneTargetIndex) + it + lastSyllable.substring(toneTargetIndex + 1)
                     val updatedWord = lastWord.substring(0, lastSyllableStart) + newSyllable
 
-                    val textBeforeWord = lastTextBeforeCursor.dropLast(lastWord.length)
-                    inputConnection.deleteSurroundingText(lastTextBeforeCursor.length, 0)
-                    inputConnection.commitText(textBeforeWord + updatedWord, 1)
+                    val textBeforeWord = inputText.dropLast(lastWord.length)
+                    inputConnection.deleteSurroundingText(inputText.length, 0)
 
+                    // Apply color formatting while preserving previous highlights
+                    highlightPinyin(inputConnection, textBeforeWord + updatedWord)
+
+                    // Update pinyin tracking (ensures tone number isn't repeatedly added)
                     if (pinyin.takeLast(1).matches(Regex("[1-4]"))) {
                         pinyin = pinyin.dropLast(1)
                     }
@@ -320,6 +341,68 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
 
         return super.onKeyDown(keyCode, event)
     }
+
+    private fun highlightPinyin(inputConnection: InputConnection, text: String) {
+        val consonants = listOf(
+            "zh", "ch", "sh",
+            "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h",
+            "j", "q", "x", "z", "r", "c", "s", "y", "w"
+        )
+        val vowels = listOf(
+            "an", "en", "in", "un", "ün", "er", "ong",
+            "i", "a", "ai", "ao", "ie", "ing",
+            "u", "o", "ei", "ou", "üe", "eng",
+            "ü", "e", "ui", "iu", "ang",
+            "ng"
+        )
+        val toneMarks =  "āáǎàōóǒòēéěèīíǐìūúǔùǖǘǚǜ"
+
+        val spannable = SpannableString(text)
+
+        // Color consonants (light blue)
+        val consonantRegex = "(${consonants.joinToString("|")})".toRegex()
+        consonantRegex.findAll(text).forEach { match ->
+            spannable.setSpan(
+                ForegroundColorSpan(Color.parseColor("#6CA6CD")), // Light Blue
+                match.range.first, match.range.last + 1,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Color vowels (white)
+        val vowelRegex = "(${vowels.joinToString("|")})".toRegex()
+        vowelRegex.findAll(text).forEach { match ->
+            spannable.setSpan(
+                ForegroundColorSpan(Color.WHITE),
+                match.range.first, match.range.last + 1,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Color tone marks (yellow)
+        val toneRegex = "[$toneMarks]".toRegex()
+        toneRegex.findAll(text).forEach { match ->
+            spannable.setSpan(
+                ForegroundColorSpan(Color.YELLOW),
+                match.range.first, match.range.last + 1,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        val rOrNAtEndRegex = "[rng]\\b".toRegex() // Matches 'r' or 'n' only if at the end of a word
+        rOrNAtEndRegex.findAll(text).forEach { match ->
+            spannable.setSpan(
+                ForegroundColorSpan(Color.WHITE), // Make final 'r' or 'n' or 'g' white
+                match.range.first, match.range.last + 1,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Replace text with formatted version
+        inputConnection.deleteSurroundingText(text.length, 0)
+        inputConnection.commitText(spannable, 1)
+    }
+
 
     private fun applyTone(vowel: Char, toneIndex: Int): Char? {
         val pinyinTones = mapOf(
