@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.pinyinkeyboard"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.pinyinkeyboard"
@@ -51,6 +51,7 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
