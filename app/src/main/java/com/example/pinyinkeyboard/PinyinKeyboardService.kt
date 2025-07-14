@@ -265,6 +265,7 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             if(pinyin == "long") pinyin+= Char(48)
 
             playSound(this, pinyin)
+            Log.d("PinyinDebug", pinyin);
             pinyin=""
 
             return true // Prevents default system action
@@ -299,26 +300,41 @@ class PinyinKeyboardService : InputMethodService(), OnKeyboardActionListener {
             // Find syllable start position
             val consonantRegex = "(${consonants.joinToString("|")})(?=[aeiouü])".toRegex()
             val lastSyllableStart = consonantRegex.findAll(lastWord).lastOrNull()?.range?.first ?: 0
-            val lastSyllable = lastWord.substring(lastSyllableStart)
+            var lastSyllable = lastWord.substring(lastSyllableStart)
 
-            // Identify vowel for tone placement
+            // First remove any existing tone marks by converting to plain vowels
+            val plainVowels = mapOf(
+                'ā' to 'a', 'á' to 'a', 'ǎ' to 'a', 'à' to 'a',
+                'ō' to 'o', 'ó' to 'o', 'ǒ' to 'o', 'ò' to 'o',
+                'ē' to 'e', 'é' to 'e', 'ě' to 'e', 'è' to 'e',
+                'ī' to 'i', 'í' to 'i', 'ǐ' to 'i', 'ì' to 'i',
+                'ū' to 'u', 'ú' to 'u', 'ǔ' to 'u', 'ù' to 'u',
+                'ǖ' to 'ü', 'ǘ' to 'ü', 'ǚ' to 'ü', 'ǜ' to 'ü'
+            )
+
+            // Convert syllable to plain vowels first
+            val plainSyllable = lastSyllable.map { c -> plainVowels[c] ?: c }.joinToString("")
+
+            // Identify vowel for tone placement using the plain syllable
             val vowels = listOf('a', 'o', 'e', 'i', 'u', 'ü')
-            val vowelIndices = lastSyllable.mapIndexedNotNull { index, c -> if (c in vowels) index else null }
+            val vowelIndices = plainSyllable.mapIndexedNotNull { index, c -> if (c in vowels) index else null }
 
             if (vowelIndices.isNotEmpty()) {
                 val toneTargetIndex = when {
                     vowelIndices.size == 1 -> vowelIndices[0]
-                    'a' in lastSyllable -> lastSyllable.indexOf('a')
-                    'o' in lastSyllable -> lastSyllable.indexOf('o')
-                    'e' in lastSyllable -> lastSyllable.indexOf('e')
+                    'a' in plainSyllable -> plainSyllable.indexOf('a')
+                    'o' in plainSyllable -> plainSyllable.indexOf('o')
+                    'e' in plainSyllable -> plainSyllable.indexOf('e')
                     else -> vowelIndices.last()
                 }
 
-                val toneVowel = lastSyllable[toneTargetIndex]
+                val toneVowel = plainSyllable[toneTargetIndex]
                 val tonedVowel = applyTone(toneVowel, toneIndex)
 
                 tonedVowel?.let {
-                    val newSyllable = lastSyllable.substring(0, toneTargetIndex) + it + lastSyllable.substring(toneTargetIndex + 1)
+                    val newSyllable = plainSyllable.substring(0, toneTargetIndex) +
+                            it +
+                            plainSyllable.substring(toneTargetIndex + 1)
                     val updatedWord = lastWord.substring(0, lastSyllableStart) + newSyllable
 
                     val textBeforeWord = inputText.dropLast(lastWord.length)
